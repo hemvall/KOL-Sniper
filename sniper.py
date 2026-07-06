@@ -36,7 +36,7 @@ CHANNELS = [c.strip() for c in os.environ["TG_CHANNELS"].split(",") if c.strip()
 
 PRIVATE_KEY = os.environ["SOL_PRIVATE_KEY"]                      # base58 burner wallet key
 RPC_URL = os.environ.get("SOL_RPC_URL", "https://api.mainnet-beta.solana.com")
-BUY_SOL = float(os.environ.get("BUY_SOL", "0.05"))              # buy size per snipe (SOL)
+BUY_SOL = float(os.environ.get("BUY_SOL", "0.5"))              # buy size per snipe (SOL)
 SLIPPAGE = int(os.environ.get("SLIPPAGE", "15"))               # %
 PRIORITY_FEE = float(os.environ.get("PRIORITY_FEE", "0.001"))  # SOL (raise if txs don't land)
 POOL = os.environ.get("POOL", "auto")                          # pump / raydium / auto...
