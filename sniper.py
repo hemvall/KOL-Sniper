@@ -182,11 +182,14 @@ async def handler(event):
         # prepare enhanced notification
         try:
             channel = str(getattr(event, 'chat_id', ''))
+                deep_link_base = os.getenv('GMGN_DEEP_LINK', 'https://gmgn.ai/sol/token')
+            deep_link = deep_link_base.rstrip('/') + '/' + mint
             text_lines = [
                 f"🟩 BUY executed",
                 f"Mint: {mint}",
                 f"Bet: {BUY_SOL} SOL",
                 f"Tx: https://solscan.io/tx/{sig}",
+                f"GMGN: {deep_link}",
                 f"Channel: {channel}",
             ]
             # entry price not available immediately; leave placeholder
@@ -197,7 +200,7 @@ async def handler(event):
             log.error("Telegram notify failed: %s", e)
         # persist the trade row (atomic)
         try:
-            log_call(mint=mint, bet_sol=BUY_SOL, channel=channel, tx=sig, notified=bool(notified))
+            log_call(mint=mint, bet_sol=BUY_SOL, channel=channel, tx=sig, notified=bool(notified), note=deep_link)
         except Exception:
             log.exception("Failed to log call for %s", mint)
         if AUTOSELL:

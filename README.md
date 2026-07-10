@@ -58,7 +58,7 @@ Setup:
 ```
 pip install -r requirements.txt
 export TELEGRAM_BOT_TOKEN="<your-bot-token>"       # Windows: set TELEGRAM_BOT_TOKEN=...
-export GMGN_DEEP_LINK="https://gmgn.app/token"     # optional deep link base
+export GMGN_DEEP_LINK="https://gmgn.ai/sol/token"     # optional deep link base
 python telegram_bot.py
 ```
 

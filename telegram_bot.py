@@ -82,7 +82,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if not found:
         return
 
-    deep_link_base = os.getenv("GMGN_DEEP_LINK", "https://gmgn.ai/sol")
+    deep_link_base = os.getenv("GMGN_DEEP_LINK", "https://gmgn.ai/sol/token")
 
     for contract in set(found):
         await update.message.reply_text(f"Looking up {contract}...")
@@ -133,7 +133,7 @@ async def gm_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
     contract = args[0]
 
-    deep_link_base = os.getenv("GMGN_DEEP_LINK", "https://gmgn.app/token")
+    deep_link_base = os.getenv("GMGN_DEEP_LINK", "https://gmgn.ai/sol/token")
     deep_link = deep_link_base.rstrip('/') + '/' + contract
     await update.message.reply_text(f"Open GMGN: {deep_link}")
 
@@ -296,7 +296,7 @@ def format_recent_calls_text(n: int | None = None) -> str:
     rows = _read_calls(n)
     if not rows:
         return "No calls logged."
-    deep_link_base = os.getenv('GMGN_DEEP_LINK', 'https://gmgn.app/token')
+    deep_link_base = os.getenv('GMGN_DEEP_LINK', 'https://gmgn.ai/sol/token')
     parts = [f"Recent {len(rows)} calls:"]
     for r in rows:
         ts = r.get('ts','')[:16]
