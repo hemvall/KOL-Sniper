@@ -20,6 +20,7 @@ import websockets
 from dotenv import load_dotenv
 from telethon import TelegramClient, events
 from notify import send_telegram_notification
+from logger import log_call
 from solders.keypair import Keypair
 from solders.pubkey import Pubkey
 from solders.transaction import VersionedTransaction
@@ -178,12 +179,27 @@ async def handler(event):
     sig = await asyncio.get_event_loop().run_in_executor(None, buy, mint)
     if sig:
         log.info("BUY sent: https://solscan.io/tx/%s", sig)
-        # notify via Telegram bot (set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in env)
+        # prepare enhanced notification
         try:
-            text = f"Bought token {mint} for {BUY_SOL} SOL\nTx: https://solscan.io/tx/{sig}"
-            await asyncio.get_event_loop().run_in_executor(None, send_telegram_notification, text)
+            channel = str(getattr(event, 'chat_id', ''))
+            text_lines = [
+                f"🟩 BUY executed",
+                f"Mint: {mint}",
+                f"Bet: {BUY_SOL} SOL",
+                f"Tx: https://solscan.io/tx/{sig}",
+                f"Channel: {channel}",
+            ]
+            # entry price not available immediately; leave placeholder
+            text = "\n".join(text_lines)
+            notified = await asyncio.get_event_loop().run_in_executor(None, send_telegram_notification, text)
         except Exception as e:
+            notified = False
             log.error("Telegram notify failed: %s", e)
+        # persist the trade row (atomic)
+        try:
+            log_call(mint=mint, bet_sol=BUY_SOL, channel=channel, tx=sig, notified=bool(notified))
+        except Exception:
+            log.exception("Failed to log call for %s", mint)
         if AUTOSELL:
             asyncio.create_task(monitor_and_sell(mint))
     else:

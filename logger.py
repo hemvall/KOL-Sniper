@@ -19,7 +19,8 @@ import argparse
 from datetime import datetime, timezone
 
 CSV_PATH = os.environ.get("CALLS_CSV", "calls.csv")
-FIELDS = ["ts", "mint", "channel", "bet_sol", "entry", "exit", "ath", "pnl_pct", "note"]
+# add tx and notified to capture transaction signature and notification status
+FIELDS = ["ts", "mint", "channel", "bet_sol", "entry", "exit", "ath", "pnl_pct", "tx", "notified", "note"]
 
 try:
     from colorama import init as _init_colorama, Fore, Style
@@ -52,14 +53,24 @@ def _read():
 
 
 def _write(rows):
-    with open(CSV_PATH, "w", newline="") as f:
+    # atomic write: write to temp then replace
+    tmp = CSV_PATH + ".tmp"
+    with open(tmp, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=FIELDS)
         w.writeheader()
         w.writerows(rows)
+    try:
+        os.replace(tmp, CSV_PATH)
+    except Exception:
+        # best-effort cleanup
+        try:
+            os.remove(tmp)
+        except Exception:
+            pass
 
 
 def log_call(mint, bet_sol, channel="", entry=None, exit=None, ath=None,
-             pnl_pct=None, note=""):
+             pnl_pct=None, tx=None, notified=None, note=""):
     """Add a row or update the last open trade for the same mint."""
     if pnl_pct is None and entry and exit:
         pnl_pct = (float(exit) / float(entry) - 1.0) * 100.0
@@ -81,7 +92,8 @@ def log_call(mint, bet_sol, channel="", entry=None, exit=None, ath=None,
         "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "mint": mint, "channel": channel, "bet_sol": bet_sol,
         "entry": entry or "", "exit": exit or "", "ath": ath or "",
-        "pnl_pct": round(pnl_pct, 2) if pnl_pct is not None else "", "note": note,
+        "pnl_pct": round(pnl_pct, 2) if pnl_pct is not None else "",
+        "tx": tx or "", "notified": str(bool(notified)), "note": note,
     })
     _write(rows)
 
