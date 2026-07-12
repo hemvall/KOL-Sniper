@@ -224,8 +224,8 @@ async def handler(event):
             if entry_price is not None:
                 text_lines.append(f"Entry price: {entry_price:.10f} SOL")
             text_lines.extend([
-                f"Tx: https://solscan.io/tx/{sig}",
                 f"GMGN: {deep_link}",
+                f"Tx: https://solscan.io/tx/{sig}",
                 f"Channel: {channel}",
             ])
             text = "\n".join(text_lines)

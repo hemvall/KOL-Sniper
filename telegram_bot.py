@@ -124,6 +124,14 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     await menu_command(update, context)
 
 
+async def id_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Reply with this chat's id — paste it into TELEGRAM_CHAT_ID in .env."""
+    chat = update.effective_chat
+    await update.message.reply_text(
+        f"chat id: {chat.id}\n(set TELEGRAM_CHAT_ID={chat.id} in .env for buy notifications)"
+    )
+
+
 async def gm_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # /gm 0x...
     args = context.args
@@ -375,6 +383,7 @@ def main() -> None:
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(CommandHandler('start', start_command))
     app.add_handler(CommandHandler('gm', gm_command))
+    app.add_handler(CommandHandler('id', id_command))
     app.add_handler(CommandHandler('log', log_command))
     app.add_handler(CommandHandler('stats', stats_command))
     app.add_handler(CommandHandler('list', list_command))

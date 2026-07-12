@@ -13,7 +13,8 @@ def send_telegram_notification(text: str) -> bool:
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     if not token or not chat_id:
-        logger.debug("Telegram notify not configured (TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID missing)")
+        missing = [n for n, v in (("TELEGRAM_BOT_TOKEN", token), ("TELEGRAM_CHAT_ID", chat_id)) if not v]
+        logger.warning("Telegram notify not configured (missing: %s)", ", ".join(missing))
         return False
 
     token = token.strip()

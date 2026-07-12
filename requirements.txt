@@ -5,3 +5,4 @@ solder
 numpy
 colorama
 python-telegram-bot
+telethon
